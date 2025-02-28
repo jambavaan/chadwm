@@ -6,7 +6,7 @@
 interval=0
 
 # load colors
-. ~/.config/chadwm_setup/chadwm/bar_themes/catppuccin
+. ~/.config/chadwm_setup/chadwm/bar_themes/tokyonight
 
 cpu() {
 #  cpu_val=$(grep -o "^[^ ]*" /proc/loadavg)
@@ -32,7 +32,11 @@ batt() {
 #  get_capacity="$(cat /sys/class/power_supply/BAT1/capacity)"
 #  printf "  ^c$blue^   $get_capacity"
   get_capacity="$(battery)"
-  printf "^c$blue^  $get_capacity%"
+  if [ 10 -gt $(cat /sys/class/power_supply/BAT0/capacity) ]; then
+      printf "^c$red^  $get_capacity%"
+  else
+      printf "^c$green^  $get_capacity%"
+  fi
 }
 
 net_speed() {

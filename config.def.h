@@ -43,7 +43,7 @@ static const char *fonts[] = {"JetBrainsMono Nerd Font:style:medium:pixelsize=15
 static const char dmenufont[] = "JetBrains Mono:size=20";
 
 // theme
-#include "themes/onedark.h"
+#include "./themes/tokyonight.h"
 
 static const char *colors[][3]      = {
     /*                     fg       bg      border */
