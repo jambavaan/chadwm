@@ -32,7 +32,7 @@ batt() {
 #  get_capacity="$(cat /sys/class/power_supply/BAT1/capacity)"
 #  printf "  ^c$blue^   $get_capacity"
   get_capacity="$(battery)"
-  if [ 10 -gt $(cat /sys/class/power_supply/BAT0/capacity) ]; then
+  if [ 20 -gt $(cat /sys/class/power_supply/BAT0/capacity) ]; then
       printf "^c$red^  $get_capacity%"
   else
       printf "^c$green^  $get_capacity%"
@@ -57,12 +57,12 @@ mem() {
   printf "^c$blue^ $(memoryusage)%"
 }
 
-#wlan() {
-#	case "$(cat /sys/class/net/wl*/operstate 2>/dev/null)" in
-#	up) printf "^c$black^ ^b$blue^ 󰤨 ^d^%s" " ^c$blue^Connected" ;;
-#	down) printf "^c$black^ ^b$blue^ 󰤭 ^d^%s" " ^c$blue^Disconnected" ;;
-#	esac
-#}
+wlan() {
+	case "$(cat /sys/class/net/wl*/operstate 2>/dev/null)" in
+	up) printf " ^c$blue^󰤨 ^d^";;
+	down) printf " ^c$blue^󰤭 ^d^";;
+	esac
+}
 
 clock() {
 	printf "^c$black^ ^b$darkblue^ 󱑆 "
@@ -74,5 +74,5 @@ while true; do
   [ $interval = 0 ] || [ $(($interval % 3600)) = 0 ] 
   interval=$((interval + 1))
 
-  sleep 1 && xsetroot -name " $(net_speed) $(batt) $(cpu) $(mem) $(clock)"
+  sleep 1 && xsetroot -name " $(net_speed) $(batt) $(cpu) $(mem) $(wlan) $(clock)"
 done
