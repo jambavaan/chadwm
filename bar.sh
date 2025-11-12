@@ -12,7 +12,7 @@ cpu() {
 #  cpu_val=$(grep -o "^[^ ]*" /proc/loadavg)
   cpu_val=$(cpuusage)
 
-  printf "^c$black^ ^b$green^ CPU"
+  printf "^c$black^ ^b$green^ 󰧑 "
   printf "^c$white^ ^b$grey^ $cpu_val%"
 }
 
@@ -39,13 +39,6 @@ batt() {
   fi
 }
 
-net_speed() {
-#  get_capacity="$(cat /sys/class/power_supply/BAT1/capacity)"
-#  printf "  ^c$blue^   $get_capacity"
-  speed="$(nettraf)"
-  printf "  ^c$blue^  $speed"
-}
-
 #brightness() {
 #  printf "^c$red^   "
 #  printf "^c$red^%.0f\n" $(cat /sys/class/backlight/*/brightness)
@@ -53,20 +46,21 @@ net_speed() {
 
 mem() {
   printf "^c$blue^^b$black^  "
-#  printf "^c$blue^ $(free -h | awk '/^Mem/ { print $3 }' | sed s/i//g)"
-  printf "^c$blue^ $(memoryusage)%"
+  printf "^c$blue^ $(free -h | awk '/^Mem/ {printf $3 "/" } /^Swap/ {printf $3 }' | sed s/i//g)"
+  # printf "^c$blue^ $(memoryusage)%"
 }
 
 wlan() {
+  speed="$(nettraf)"
 	case "$(cat /sys/class/net/wl*/operstate 2>/dev/null)" in
-	up) printf " ^c$blue^󰤨 ^d^";;
-	down) printf " ^c$blue^󰤭 ^d^";;
+	up) printf "^c$blue^ $speed ^c$blue^ 󰤨 ^d^";;
+	down) printf "  ^c$blue^󰤭 ^d^";;
 	esac
 }
 
 clock() {
 	printf "^c$black^ ^b$darkblue^ 󱑆 "
-	printf "^c$black^^b$blue^ $(date '+%H:%M')  "
+	printf "^c$black^^b$blue^ $(date '+%H:%M %d/%b')  "
 }
 
 while true; do
@@ -74,5 +68,5 @@ while true; do
   [ $interval = 0 ] || [ $(($interval % 3600)) = 0 ] 
   interval=$((interval + 1))
 
-  sleep 1 && xsetroot -name " $(net_speed) $(batt) $(cpu) $(mem) $(wlan) $(clock)"
+  sleep 1 && xsetroot -name " $(batt) $(mem) $(cpu) $(wlan) $(clock)"
 done
