@@ -607,7 +607,7 @@ void arrangemon(Monitor *m) {
   updatesystray();
   XMoveResizeWindow(dpy, m->tabwin, m->wx + m->gappov, m->ty, m->ww - 2 * m->gappov, th);
   XMoveWindow(dpy, m->tagwin, m->wx + m->gappov, m->by + (m->topbar ? (bh + m->gappoh) : (- (m->mh / scalepreview) - m->gappoh)));
-  strncpy(m->ltsymbol, m->lt[m->sellt]->symbol, sizeof m->ltsymbol);
+  strncpy(m->ltsymbol, m->lt[m->sellt]->symbol, sizeof m->ltsymbol-1);
   if (m->lt[m->sellt]->arrange)
     m->lt[m->sellt]->arrange(m);
 }
@@ -2013,12 +2013,13 @@ void grabkeys(void) {
     for (k = start; k <= end; k++)
       for (i = 0; i < LENGTH(keys); i++)
     /* skip modifier codes, we do that ourselves */
-    if (keys[i].keysym == syms[(k - start) * skip])
+    if (keys[i].keysym == syms[(k - start) * skip]){
       for (j = 0; j < LENGTH(modifiers); j++)
         XGrabKey(dpy, k,
            keys[i].mod | modifiers[j],
            root, True,
            GrabModeAsync, GrabModeAsync);
+    }
       XFree(syms);
   }
 }
@@ -2921,7 +2922,7 @@ void setlayout(const Arg *arg) {
   if (arg && arg->v)
     selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt] = (Layout *)arg->v;
   strncpy(selmon->ltsymbol, selmon->lt[selmon->sellt]->symbol,
-          sizeof selmon->ltsymbol);
+          sizeof selmon->ltsymbol-1);
   if (selmon->sel)
     arrange(selmon);
   else
