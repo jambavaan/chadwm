@@ -1,0 +1,1 @@
+/home/chaman/.cache/wal/chadwm_pywal.h
