@@ -10,10 +10,9 @@ interval=0
 
 cpu() {
 #  cpu_val=$(grep -o "^[^ ]*" /proc/loadavg)
-  cpu_val=$(cpuusage)
 
-  printf "^c$black^ ^b$green^ 󰧑 "
-  printf "^c$white^ ^b$grey^ $cpu_val%"
+  printf "^c$green^ 🧠 "
+  printf "^c$white^ $(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1"%"}')% ^d^"
 }
 
 #pkg_updates() {
@@ -45,22 +44,52 @@ batt() {
 #}
 
 mem() {
-  printf "^c$blue^^b$black^  "
-  printf "^c$blue^ $(free -h | awk '/^Mem/ {printf $3 "/" } /^Swap/ {printf $3 }' | sed s/i//g)"
+  printf "^c$blue^  "
+  printf "^c$white^ $(free -h | awk '/^Mem/ {printf $3 "/" } /^Swap/ {printf $3 }' | sed s/i//g)"
   # printf "^c$blue^ $(memoryusage)%"
 }
 
 wlan() {
   speed="$(nettraf)"
 	case "$(cat /sys/class/net/wl*/operstate 2>/dev/null)" in
-	up) printf "^c$blue^ $speed ^c$blue^ 󰤨 ^d^";;
-	down) printf "  ^c$blue^󰤭 ^d^";;
+	up) printf "^c$green^ 󰤨 ^c$white^ $speed ^d^";;
+	down) printf " ^c$red^󰤭 ^d^";;
 	esac
 }
 
 clock() {
-	printf "^c$black^ ^b$darkblue^ 󱑆 "
-	printf "^c$black^^b$blue^ $(date '+%H:%M %d/%b')  "
+
+    case "$(date '+%I')" in
+        "00") icon="🕛" ;;
+        "01") icon="🕐" ;;
+        "02") icon="🕑" ;;
+        "03") icon="🕒" ;;
+        "04") icon="🕓" ;;
+        "05") icon="🕔" ;;
+        "06") icon="🕕" ;;
+        "07") icon="🕖" ;;
+        "08") icon="🕗" ;;
+        "09") icon="🕘" ;;
+        "10") icon="🕙" ;;
+        "11") icon="🕚" ;;
+        "12") icon="🕛" ;;
+    esac
+	printf "^c$blue^ $icon "
+	printf "^c$white^ $(date -d "+1 minutes" '+%H:%M %d/%b')  "
+}
+
+music() {
+    if [ "$(playerctl status)" = "Playing" ]; then
+        printf "^c$blue^  "
+        instance=$(playerctl --list-all | head -n1)
+        case "$instance" in
+        *firefox*) printf "^c$white^ Firefox";;
+        *mpv*) 	   printf "^c$white^ MPV";;
+        *mpd*) 	   printf "^c$white^ $(playerctl --player=playerctld  metadata --format '{{title}}')";;
+        esac
+   fi
+  # printf "^c$blue^ $([ "$(playerctl status)" = "Playing" ] && playerctl --player=playerctld  metadata --format '{{title}}')"
+  # printf "^c$blue^ $([ "$(rmpc status | jq -r .state)" = "Play" ] && rmpc song | jq -r '.metadata.title')"
 }
 
 while true; do
@@ -68,5 +97,5 @@ while true; do
   [ $interval = 0 ] || [ $(($interval % 3600)) = 0 ] 
   interval=$((interval + 1))
 
-  sleep 1 && xsetroot -name " $(batt) $(mem) $(cpu) $(wlan) $(clock)"
+  sleep 1 && xsetroot -name " $(batt) $(music) $(cpu) $(mem) $(wlan) $(clock)"
 done
